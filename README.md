@@ -37,7 +37,7 @@
     padding: 0.6rem;
     overflow-y: auto;
     box-shadow: 0 0 8px #00ffcc;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     line-height: 1.4;
   }
   .term-input {
@@ -50,7 +50,7 @@
     color: #fff;
     border: 2px solid #ff00ff;
     padding: 0.6rem;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
   }
   .term-input button {
     background: black;
@@ -58,7 +58,7 @@
     border: 2px solid #ff00ff;
     padding: 0.6rem;
     cursor: pointer;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
   }
   .term-input button:hover {
     background: #ff00ff;
