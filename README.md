@@ -1,196 +1,210 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Arcade Math Terminal</title>
 
-<!-- Retro Pixel Arcade Font -->
+<!-- Retro Pixel Arcade Font (fallback to monospace if blocked) -->
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
 <style>
-  body {
-    margin: 0;
-    font-family: 'Press Start 2P', cursive;
-    background-color: #0d0d0d;
-    color: #00ffcc;
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
+  :root{
+    --bg:#0d0d0d; --neon:#00ffcc; --accent:#ff00ff; --panel:#000;
+  }
+  html,body{height:100%;}
+  body{
+    margin:0;
+    font-family: 'Press Start 2P', monospace, monospace;
+    background:var(--bg);
+    color:var(--neon);
+    display:flex;
+    flex-direction:column;
+    min-height:100vh;
     background-image: repeating-linear-gradient(
       to bottom,
-      rgba(255, 255, 255, 0.02) 0px,
-      rgba(255, 255, 255, 0.02) 2px,
+      rgba(255,255,255,0.02) 0px,
+      rgba(255,255,255,0.02) 2px,
       transparent 2px,
       transparent 4px
     );
   }
-  header {
-    text-align: center;
-    padding: 1rem;
-    font-size: 1rem;
-    color: #ff00ff;
-    text-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff;
+  header{
+    text-align:center;
+    padding:12px 8px;
+    font-size:14px;
+    color:var(--accent);
+    text-shadow:0 0 8px var(--accent), 0 0 16px var(--accent);
   }
-  main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    padding: 0.5rem;
-    gap: 1rem;
-    overflow-y: auto;
+  main{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    padding:8px;
+    box-sizing:border-box;
   }
-  .terminal {
-    flex: 1;
-    background: #000;
-    border: 2px solid #00ffcc;
-    padding: 1rem;
-    overflow-y: auto;
-    box-shadow: 0 0 15px #00ffcc;
-    font-size: 0.8rem;
-    line-height: 1.5;
+  .terminal{
+    flex:1;
+    background:var(--panel);
+    border:3px solid var(--neon);
+    padding:12px;
+    box-shadow:0 0 16px var(--neon);
+    overflow:auto;
+    font-size:12px;
+    line-height:1.4;
   }
-  .term-line {
-    white-space: pre-wrap;
-    word-wrap: break-word;
+  .term-line{ white-space:pre-wrap; word-wrap:break-word; margin:4px 0; }
+  .term-input{ display:flex; gap:8px; align-items:center; }
+  input[type="text"]{
+    flex:1;
+    padding:10px 8px;
+    border:2px solid var(--accent);
+    background:#06060a;
+    color:var(--neon);
+    font-family:inherit;
+    font-size:12px;
+    outline:none;
   }
-  .term-input {
-    display: flex;
-    gap: 0.5rem;
+  button{
+    padding:10px 12px;
+    background:#06060a;
+    border:2px solid var(--accent);
+    color:var(--neon);
+    cursor:pointer;
+    font-family:inherit;
+    font-size:12px;
   }
-  .term-input input {
-    flex: 1;
-    background: black;
-    color: #fff;
-    border: 2px solid #ff00ff;
-    padding: 0.8rem;
-    font-family: 'Press Start 2P', cursive;
-    font-size: 0.7rem;
-  }
-  .term-input button {
-    background: black;
-    color: #fff;
-    border: 2px solid #ff00ff;
-    padding: 0.8rem;
-    cursor: pointer;
-    text-shadow: 0 0 5px #ff00ff;
-    font-family: 'Press Start 2P', cursive;
-    font-size: 0.7rem;
-  }
-  .term-input button:hover {
-    background: #ff00ff;
-    color: black;
-    box-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff;
+  button:hover{ background:var(--accent); color:#000; box-shadow:0 0 8px var(--accent); }
+  /* portrait friendly */
+  @media (min-width:700px){
+    main{max-width:420px;margin:0 auto;}
   }
 </style>
 </head>
-
 <body>
   <header>🎮 RETRO MATH TERMINAL 🎮</header>
   <main>
-    <div class="terminal" id="terminal"></div>
+    <div class="terminal" id="terminal" aria-live="polite"></div>
+
     <div class="term-input">
-      <input id="termInput" placeholder="Type command here..." autocomplete="off" />
-      <button onclick="sendCommand()">RUN</button>
+      <input id="termInput" type="text" placeholder="Type command (e.g. load 1, check -0.5)..." autocomplete="off" />
+      <button id="runBtn" type="button">RUN</button>
     </div>
   </main>
 
 <script>
+// Wrap everything to be safe for all pages and ensure DOM is ready
+window.addEventListener('DOMContentLoaded', function () {
+  // Use ASCII-friendly strings to avoid encoding issues (x^2 instead of superscript)
   const correctAnswers = {
     1: { type: "Rational Equation", question: "1/(x+1) = 2. What is x?", answers: ["-0.5", "-1/2"] },
     2: { type: "Inequality", question: "2x - 3 > 5. What is the solution?", answers: ["x > 4"] },
-    3: { type: "Function", question: "f(x) = x² + 1. Find f(3)", answers: ["10"] }
+    3: { type: "Function", question: "f(x) = x^2 + 1. Find f(3)", answers: ["10"] }
   };
 
   let currentCard = null;
-  const terminal = document.getElementById("terminal");
-  const termInput = document.getElementById("termInput");
+  const terminal = document.getElementById('terminal');
+  const termInput = document.getElementById('termInput');
+  const runBtn = document.getElementById('runBtn');
 
-  function appendToTerminal(text) {
-    const line = document.createElement("div");
-    line.className = "term-line";
-    line.textContent = text;
-    terminal.appendChild(line);
+  function appendToTerminal(text, cssClass) {
+    const el = document.createElement('div');
+    el.className = 'term-line' + (cssClass ? ' ' + cssClass : '');
+    el.textContent = text;
+    terminal.appendChild(el);
     terminal.scrollTop = terminal.scrollHeight;
   }
 
   function printWelcome() {
-    appendToTerminal("WELCOME TO THE MATH ARCADE!");
-    appendToTerminal("Type 'help' for commands.");
+    appendToTerminal('WELCOME TO THE MATH ARCADE!');
+    appendToTerminal(\"Type 'help' for commands.\");
   }
 
+  function safeLower(s){ return String(s||'').trim().toLowerCase(); }
+
   function runCommand(cmd) {
-    const parts = cmd.trim().split(/\s+/);
-    const command = parts[0]?.toLowerCase();
-    const arg = parts.slice(1).join(" ");
+    try {
+      const raw = String(cmd||'').trim();
+      if (!raw) return;
+      const parts = raw.split(/\\s+/);
+      const command = safeLower(parts[0]);
+      const arg = parts.slice(1).join(' ');
 
-    if (!command) return;
-
-    if (command === "help") {
-      appendToTerminal("COMMANDS:");
-      appendToTerminal(" load <n> - Load card number");
-      appendToTerminal(" check <answer> - Check answer");
-      appendToTerminal(" show - Show current question");
-      appendToTerminal(" list - List all cards");
-      appendToTerminal(" clear - Clear terminal");
-    }
-    else if (command === "load") {
-      const n = parseInt(arg);
-      if (!correctAnswers[n]) {
-        appendToTerminal(`❌ Card ${n} not found.`);
-      } else {
-        currentCard = n;
-        appendToTerminal(`📜 Loaded Card ${n}: ${correctAnswers[n].type} — ${correctAnswers[n].question}`);
+      if (command === 'help') {
+        appendToTerminal('COMMANDS:');
+        appendToTerminal(' load <n>        - Load card number');
+        appendToTerminal(' check <answer>  - Check answer for loaded card');
+        appendToTerminal(' show            - Show current question');
+        appendToTerminal(' list            - List available cards');
+        appendToTerminal(' clear           - Clear terminal');
+        return;
       }
-    }
-    else if (command === "check") {
-      if (!currentCard) {
-        appendToTerminal("⚠ Load a card first with 'load <n>'.");
-      } else {
-        const ans = arg.trim().toLowerCase();
-        const valid = correctAnswers[currentCard].answers.map(a => a.toLowerCase());
-        if (valid.includes(ans)) {
-          appendToTerminal("✅ Correct!");
+
+      if (command === 'load') {
+        const n = parseInt(arg, 10);
+        if (!Number.isInteger(n) || !correctAnswers[n]) {
+          appendToTerminal('❌ Card not found. Use: list');
         } else {
-          appendToTerminal("❌ Wrong.");
+          currentCard = n;
+          appendToTerminal('📜 Loaded Card ' + n + ': ' + correctAnswers[n].type + ' — ' + correctAnswers[n].question);
         }
+        return;
       }
-    }
-    else if (command === "show") {
-      if (!currentCard) {
-        appendToTerminal("⚠ No card loaded.");
-      } else {
-        appendToTerminal(`📜 Card ${currentCard}: ${correctAnswers[currentCard].type} — ${correctAnswers[currentCard].question}`);
+
+      if (command === 'check') {
+        if (!currentCard) { appendToTerminal(\"⚠ Load a card first with 'load <n>'.\"); return; }
+        const answer = safeLower(arg);
+        const valid = correctAnswers[currentCard].answers.map(a => safeLower(a));
+        appendToTerminal(valid.includes(answer) ? '✅ Correct!' : '❌ Wrong.');
+        return;
       }
-    }
-    else if (command === "list") {
-      Object.keys(correctAnswers).forEach(k => {
-        appendToTerminal(`${k}: ${correctAnswers[k].type}`);
-      });
-    }
-    else if (command === "clear") {
-      terminal.innerHTML = "";
-      printWelcome();
-    }
-    else {
-      appendToTerminal(`❓ Unknown command: ${command}`);
+
+      if (command === 'show') {
+        if (!currentCard) { appendToTerminal('⚠ No card loaded.'); return; }
+        appendToTerminal('📜 Card ' + currentCard + ': ' + correctAnswers[currentCard].type + ' — ' + correctAnswers[currentCard].question);
+        return;
+      }
+
+      if (command === 'list') {
+        Object.keys(correctAnswers).forEach(k => {
+          const d = correctAnswers[k];
+          appendToTerminal(k + ': ' + d.type);
+        });
+        return;
+      }
+
+      if (command === 'clear') {
+        terminal.innerHTML = '';
+        printWelcome();
+        return;
+      }
+
+      appendToTerminal('❓ Unknown command: ' + command);
+    } catch (err) {
+      // Show error in terminal and log to console (helpful for debugging on GitHub Pages)
+      appendToTerminal('ERROR: ' + (err && err.message ? err.message : String(err)));
+      console.error(err);
     }
   }
 
   function sendCommand() {
-    const value = termInput.value.trim();
-    if (value) {
-      appendToTerminal("> " + value);
-      runCommand(value);
-      termInput.value = "";
-    }
+    const v = termInput.value.trim();
+    if (!v) return;
+    appendToTerminal('> ' + v);
+    runCommand(v);
+    termInput.value = '';
+    termInput.focus();
   }
 
-  termInput.addEventListener("keydown", e => {
-    if (e.key === "Enter") sendCommand();
-  });
+  runBtn.addEventListener('click', sendCommand);
+  termInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') sendCommand(); });
 
+  // Auto-focus input for quick testing on devices
+  termInput.focus();
   printWelcome();
+});
 </script>
+
 </body>
 </html>
