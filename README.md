@@ -89,7 +89,6 @@
   <header>🎮 RETRO MATH TERMINAL 🎮</header>
   <main>
     <div class="terminal" id="terminal"></div>
-
     <div class="term-input">
       <input id="termInput" placeholder="Type command here..." autocomplete="off" />
       <button onclick="sendCommand()">RUN</button>
@@ -191,9 +190,7 @@
     if (e.key === "Enter") sendCommand();
   });
 
-  // Show welcome message on load
   printWelcome();
 </script>
-
 </body>
 </html>
