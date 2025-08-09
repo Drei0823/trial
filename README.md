@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FunStep: a Staircase-Themed Puzzle for Learning Rational Functions</title>
 <style>
   body {
@@ -18,7 +18,7 @@
   header {
     text-align: center;
     padding: 0.8rem;
-    font-size: clamp(0.8rem, 2.5vw, 1rem);
+    font-size: 0.9rem;
     background-color: #111;
     color: #ff00ff;
     text-shadow: 0 0 6px #ff00ff;
@@ -37,7 +37,7 @@
     padding: 0.6rem;
     overflow-y: auto;
     box-shadow: 0 0 8px #00ffcc;
-    font-size: clamp(0.7rem, 2.5vw, 0.9rem);
+    font-size: 0.8rem;
     line-height: 1.4;
   }
   .term-input {
@@ -50,7 +50,7 @@
     color: #fff;
     border: 2px solid #ff00ff;
     padding: 0.6rem;
-    font-size: clamp(0.7rem, 2.5vw, 0.9rem);
+    font-size: 0.8rem;
   }
   .term-input button {
     background: black;
@@ -58,7 +58,7 @@
     border: 2px solid #ff00ff;
     padding: 0.6rem;
     cursor: pointer;
-    font-size: clamp(0.7rem, 2.5vw, 0.9rem);
+    font-size: 0.8rem;
   }
   .term-input button:hover {
     background: #ff00ff;
@@ -71,7 +71,7 @@
   <main>
     <div class="terminal" id="terminal"></div>
     <div class="term-input">
-      <input id="termInput" placeholder="Type card number first" autocomplete="off" />
+      <input id="termInput" placeholder="Type card number first" autocomplete="off">
       <button onclick="sendCommand()">OK</button>
     </div>
   </main>
@@ -85,6 +85,7 @@
 
   let currentCard = null;
   let waitingForAnswer = false;
+
   const terminal = document.getElementById("terminal");
   const termInput = document.getElementById("termInput");
 
@@ -103,8 +104,8 @@
 
   function handleCardNumber(input) {
     const num = parseInt(input);
-    if (isNaN(num) || !correctAnswers[num]) {
-      appendLine(`❌ Card ${input} not found.`);
+    if (!correctAnswers[num]) {
+      appendLine(`❌ Card ${num} not found.`);
       return;
     }
     currentCard = num;
@@ -114,7 +115,7 @@
   }
 
   function handleAnswer(input) {
-    const answer = input.toLowerCase().trim();
+    const answer = input.toLowerCase();
     const validAnswers = correctAnswers[currentCard].answers.map(a => a.toLowerCase());
     if (validAnswers.includes(answer)) {
       appendLine("✅ Correct!");
