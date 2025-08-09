@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Arcade Portrait</title>
 
 <!-- Google Pixel Arcade Font -->
@@ -53,23 +53,26 @@
     font-size: 0.8rem;
     line-height: 1.5;
     white-space: pre-wrap;
+    word-wrap: break-word;
   }
 
   .buttons {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    padding-bottom: 0.5rem;
   }
 
   .btn {
     background: black;
     color: #fff;
     border: 2px solid #ff00ff;
-    padding: 0.8rem;
+    padding: 1rem;
     text-align: center;
     cursor: pointer;
     transition: all 0.2s ease;
     text-shadow: 0 0 5px #ff00ff;
+    user-select: none;
   }
 
   .btn:hover {
@@ -84,8 +87,8 @@
   <header>🎮 RETRO ARCADE 🎮</header>
   <main>
     <div class="terminal" id="terminal">
-      WELCOME TO THE ARCADE!<br>
-      > Press a button below to start...
+WELCOME TO THE ARCADE!
+> Press a button below to start...
     </div>
 
     <div class="buttons">
@@ -114,7 +117,7 @@ function showHelp() {
 }
 
 function clearTerminal() {
-  document.getElementById("terminal").innerHTML = "> Terminal cleared.";
+  document.getElementById("terminal").innerText = "> Terminal cleared.";
 }
 </script>
 
