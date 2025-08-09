@@ -49,6 +49,8 @@
     box-shadow: 0 0 15px #00ffcc;
     font-size: 0.8rem;
     line-height: 1.5;
+  }
+  .term-line {
     white-space: pre-wrap;
     word-wrap: break-word;
   }
@@ -86,10 +88,7 @@
 <body>
   <header>🎮 RETRO MATH TERMINAL 🎮</header>
   <main>
-    <div class="terminal" id="terminal">
-WELCOME TO THE MATH ARCADE!
-Type <span style="color:#ff00ff">help</span> for commands.
-    </div>
+    <div class="terminal" id="terminal"></div>
 
     <div class="term-input">
       <input id="termInput" placeholder="Type command here..." autocomplete="off" />
@@ -109,8 +108,16 @@ Type <span style="color:#ff00ff">help</span> for commands.
   const termInput = document.getElementById("termInput");
 
   function appendToTerminal(text) {
-    terminal.innerHTML += "\n" + text;
+    const line = document.createElement("div");
+    line.className = "term-line";
+    line.textContent = text;
+    terminal.appendChild(line);
     terminal.scrollTop = terminal.scrollHeight;
+  }
+
+  function printWelcome() {
+    appendToTerminal("WELCOME TO THE MATH ARCADE!");
+    appendToTerminal("Type 'help' for commands.");
   }
 
   function runCommand(cmd) {
@@ -121,7 +128,12 @@ Type <span style="color:#ff00ff">help</span> for commands.
     if (!command) return;
 
     if (command === "help") {
-      appendToTerminal("COMMANDS:\n load <n> - Load card number\n check <answer> - Check answer\n show - Show current question\n list - List all cards\n clear - Clear terminal");
+      appendToTerminal("COMMANDS:");
+      appendToTerminal(" load <n> - Load card number");
+      appendToTerminal(" check <answer> - Check answer");
+      appendToTerminal(" show - Show current question");
+      appendToTerminal(" list - List all cards");
+      appendToTerminal(" clear - Clear terminal");
     }
     else if (command === "load") {
       const n = parseInt(arg);
@@ -158,7 +170,8 @@ Type <span style="color:#ff00ff">help</span> for commands.
       });
     }
     else if (command === "clear") {
-      terminal.innerHTML = "Terminal cleared.";
+      terminal.innerHTML = "";
+      printWelcome();
     }
     else {
       appendToTerminal(`❓ Unknown command: ${command}`);
@@ -177,6 +190,9 @@ Type <span style="color:#ff00ff">help</span> for commands.
   termInput.addEventListener("keydown", e => {
     if (e.key === "Enter") sendCommand();
   });
+
+  // Show welcome message on load
+  printWelcome();
 </script>
 
 </body>
