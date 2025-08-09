@@ -18,7 +18,7 @@
   header {
     text-align: center;
     padding: 0.8rem;
-    font-size: 1rem;
+    font-size: 0.9rem;
     background-color: #111;
     color: #ff00ff;
     text-shadow: 0 0 6px #ff00ff;
@@ -34,7 +34,7 @@
     flex: 1;
     background: #000;
     border: 2px solid #00ffcc;
-    padding: 0.8rem;
+    padding: 0.6rem;
     overflow-y: auto;
     box-shadow: 0 0 8px #00ffcc;
     font-size: 0.8rem;
@@ -42,7 +42,7 @@
   }
   .term-input {
     display: flex;
-    gap: 0.5rem;
+    gap: 0.4rem;
   }
   .term-input input {
     flex: 1;
@@ -58,6 +58,7 @@
     border: 2px solid #ff00ff;
     padding: 0.6rem;
     cursor: pointer;
+    font-size: 0.8rem;
   }
   .term-input button:hover {
     background: #ff00ff;
@@ -70,7 +71,7 @@
   <main>
     <div class="terminal" id="terminal"></div>
     <div class="term-input">
-      <input id="termInput" placeholder="Type here the card number and answer" autocomplete="off" />
+      <input id="termInput" placeholder="Type card number and answer (e.g. 1 -0.5)" autocomplete="off" />
       <button onclick="sendCommand()">OK</button>
     </div>
   </main>
@@ -113,11 +114,7 @@
     }
     const validAnswers = correctAnswers[cardNum].answers.map(a => a.toLowerCase());
     appendLine(`📜 Card ${cardNum}: ${correctAnswers[cardNum].question}`);
-    if (validAnswers.includes(answer)) {
-      appendLine("✅ Correct!");
-    } else {
-      appendLine("❌ Wrong.");
-    }
+    appendLine(validAnswers.includes(answer) ? "✅ Correct!" : "❌ Wrong.");
   }
 
   function sendCommand() {
