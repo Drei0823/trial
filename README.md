@@ -112,6 +112,7 @@
     waitingForAnswer = true;
     appendLine(`📜 Card ${num}: ${correctAnswers[num].question}`);
     appendLine("Now type your answer:");
+    termInput.placeholder = "Type your answer";
   }
 
   function handleAnswer(input) {
@@ -125,6 +126,7 @@
     waitingForAnswer = false;
     currentCard = null;
     appendLine("Type another card number to continue.");
+    termInput.placeholder = "Type card number first";
   }
 
   function sendCommand() {
