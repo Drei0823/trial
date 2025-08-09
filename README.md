@@ -18,7 +18,7 @@
   header {
     text-align: center;
     padding: 0.8rem;
-    font-size: 0.9rem;
+    font-size: clamp(0.8rem, 2.5vw, 1rem);
     background-color: #111;
     color: #ff00ff;
     text-shadow: 0 0 6px #ff00ff;
@@ -37,7 +37,7 @@
     padding: 0.6rem;
     overflow-y: auto;
     box-shadow: 0 0 8px #00ffcc;
-    font-size: 0.8rem;
+    font-size: clamp(0.7rem, 2.5vw, 0.9rem);
     line-height: 1.4;
   }
   .term-input {
@@ -50,7 +50,7 @@
     color: #fff;
     border: 2px solid #ff00ff;
     padding: 0.6rem;
-    font-size: 0.8rem;
+    font-size: clamp(0.7rem, 2.5vw, 0.9rem);
   }
   .term-input button {
     background: black;
@@ -58,7 +58,7 @@
     border: 2px solid #ff00ff;
     padding: 0.6rem;
     cursor: pointer;
-    font-size: 0.8rem;
+    font-size: clamp(0.7rem, 2.5vw, 0.9rem);
   }
   .term-input button:hover {
     background: #ff00ff;
@@ -83,8 +83,8 @@
     3: { question: "f(x) = x² + 1. Find f(3)", answers: ["10"] }
   };
 
-  let currentCard = null; // Track which card is loaded
-  let waitingForAnswer = false; // Track if we expect an answer
+  let currentCard = null;
+  let waitingForAnswer = false;
   const terminal = document.getElementById("terminal");
   const termInput = document.getElementById("termInput");
 
@@ -103,8 +103,8 @@
 
   function handleCardNumber(input) {
     const num = parseInt(input);
-    if (!correctAnswers[num]) {
-      appendLine(`❌ Card ${num} not found.`);
+    if (isNaN(num) || !correctAnswers[num]) {
+      appendLine(`❌ Card ${input} not found.`);
       return;
     }
     currentCard = num;
@@ -114,18 +114,13 @@
   }
 
   function handleAnswer(input) {
-    if (!currentCard) {
-      appendLine("⚠ Please select a card number first.");
-      return;
-    }
-    const answer = input.toLowerCase();
+    const answer = input.toLowerCase().trim();
     const validAnswers = correctAnswers[currentCard].answers.map(a => a.toLowerCase());
     if (validAnswers.includes(answer)) {
       appendLine("✅ Correct!");
     } else {
       appendLine("❌ Wrong.");
     }
-    // Reset to allow a new card selection
     waitingForAnswer = false;
     currentCard = null;
     appendLine("Type another card number to continue.");
