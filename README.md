@@ -32,7 +32,7 @@
     <div id="terminal" class="terminal" aria-live="polite"></div>
 
     <div class="controls">
-      <input id="termInput" type="text" placeholder="Type card number (1) or answer (-0.5)..." autocomplete="off" />
+      <input id="termInput" type="text" placeholder="Type card number and after put your answer..." autocomplete="off" />
       <button id="runBtn" type="button">RUN</button>
     </div>
 
