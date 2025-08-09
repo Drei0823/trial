@@ -71,7 +71,7 @@
   <main>
     <div class="terminal" id="terminal"></div>
     <div class="term-input">
-      <input id="termInput" placeholder="Type card number and answer (e.g. 1 -0.5)" autocomplete="off" />
+      <input id="termInput" placeholder="Type card number first" autocomplete="off" />
       <button onclick="sendCommand()">OK</button>
     </div>
   </main>
@@ -83,6 +83,8 @@
     3: { question: "f(x) = x² + 1. Find f(3)", answers: ["10"] }
   };
 
+  let currentCard = null; // Track which card is loaded
+  let waitingForAnswer = false; // Track if we expect an answer
   const terminal = document.getElementById("terminal");
   const termInput = document.getElementById("termInput");
 
@@ -95,35 +97,51 @@
 
   function printWelcome() {
     appendLine("Welcome to FunStep!");
-    appendLine("Enter the card number and your answer separated by a space.");
-    appendLine("Example: 1 -0.5");
+    appendLine("Step 1: Type the card number to see the question.");
+    appendLine("Step 2: Type the answer.");
   }
 
-  function checkCardAndAnswer(input) {
-    const parts = input.trim().split(/\s+/);
-    if (parts.length < 2) {
-      appendLine("⚠ Please type card number and answer, e.g. '1 -0.5'");
+  function handleCardNumber(input) {
+    const num = parseInt(input);
+    if (!correctAnswers[num]) {
+      appendLine(`❌ Card ${num} not found.`);
       return;
     }
-    const cardNum = parseInt(parts[0]);
-    const answer = parts.slice(1).join(" ").toLowerCase();
+    currentCard = num;
+    waitingForAnswer = true;
+    appendLine(`📜 Card ${num}: ${correctAnswers[num].question}`);
+    appendLine("Now type your answer:");
+  }
 
-    if (!correctAnswers[cardNum]) {
-      appendLine(`❌ Card ${cardNum} not found.`);
+  function handleAnswer(input) {
+    if (!currentCard) {
+      appendLine("⚠ Please select a card number first.");
       return;
     }
-    const validAnswers = correctAnswers[cardNum].answers.map(a => a.toLowerCase());
-    appendLine(`📜 Card ${cardNum}: ${correctAnswers[cardNum].question}`);
-    appendLine(validAnswers.includes(answer) ? "✅ Correct!" : "❌ Wrong.");
+    const answer = input.toLowerCase();
+    const validAnswers = correctAnswers[currentCard].answers.map(a => a.toLowerCase());
+    if (validAnswers.includes(answer)) {
+      appendLine("✅ Correct!");
+    } else {
+      appendLine("❌ Wrong.");
+    }
+    // Reset to allow a new card selection
+    waitingForAnswer = false;
+    currentCard = null;
+    appendLine("Type another card number to continue.");
   }
 
   function sendCommand() {
     const value = termInput.value.trim();
-    if (value) {
-      appendLine("> " + value);
-      checkCardAndAnswer(value);
-      termInput.value = "";
+    if (!value) return;
+    appendLine("> " + value);
+
+    if (!waitingForAnswer) {
+      handleCardNumber(value);
+    } else {
+      handleAnswer(value);
     }
+    termInput.value = "";
   }
 
   termInput.addEventListener("keydown", e => {
